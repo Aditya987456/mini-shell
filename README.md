@@ -107,6 +107,9 @@ eg - Windows
 <br>
 
 ### 4. Shell -- User space program gives interface to interact with kernel using sysytem calls.
+
+> **Shell is as -> REPL** - Read, Evaluate, Print, Loop.
+
 - Interprets commands  --> Talks to kernel
 
 - Program running inside terminal(its just a windows, eg-gnome,windows terminal.)
@@ -146,10 +149,100 @@ Shell translates-
  ```
 
 
+
+
 <br>
 <br>
 
-### 6. 
+### steps in creating shell-
+
+1. Process Indentifier (PID) and Parent Process Identifier(PPID).
+2. Command Line Argument (argc and argv)
+3. Creating Processesn( with execve ststem calll)
+4. Creating Processed ( with the fork system call)
+5. Suspending Processes ( with the wait system call)
+6. File Information ( with the stat system call)
+7. Environment ( printenv, etc)
+
+
+---
+
+---
+
+
+<br>
+<br>
+<br>
+
+
+
+### 1. Process Identifier (PID) and Parent Process Identifier (PPID)
+---
+
+**Process** - It is an instance of an executing program that has a unique ID.
+It is basically a program in execution.
+
+> **parent process** - process that creates the child process.
+
+> **Parent Process identifier(PPID)** - uniques identifier of the parent process.
+
+<br>
+
+> **pid_t** - data type is a signed integer capable of representing a process ID.
+
+
+<br>
+
+
+```
+- Shell is a process
+- Commands are child processes
+```
+
+<br>
+<br>
+<br>
+
+
+### fork() system call - used to create processes , It takes no arguments.
+
+---
+
+
+<br>
+
+Return -
+- pid of the child in the parent
+- 0 on the child
+- -1 if unsuccessful.
+
+> **Basic operation -** After a new child process is created, both processes will execute the new instruction following the fork() system call.
+
+
+<br>
+<br>
+
+Before fork-
+```
+Shell (PID 2000)
+
+```
+
+After fork-
+
+```
+Shell (PID 2000)  ← parent
+└── Shell (PID 2001)  ← child (copy)
+
+```
+
+
+
+
+
+
+
+
 
 
 
