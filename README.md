@@ -236,6 +236,37 @@ Shell (PID 2000)  ← parent
 
 ```
 
+<br>
+
+**When we open terminal -** <br>
+- A shell (like bash) starts<br>
+- The shell runs in a loop<br>
+- It waits for your commands.
+
+
+<br>
+<br>
+
+```
+If a command must change the shell → no fork
+If a command can safely die → use fork
+```
+<br>
+
+```
+Shell (always alive)
+├── ls      (child, dies)
+├── ps      (child, dies)
+├── mkdir   (child, dies, folder stays)
+├── touch   (child, dies, file stays)
+└── cd      (runs inside shell)
+
+```
+
+<br>
+
+
+
 
 
 
