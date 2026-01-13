@@ -264,6 +264,28 @@ Shell (always alive)
 ```
 
 <br>
+<br>
+
+> **Orphan process** - This is a rinning process whose parent has finished or terminated.
+
+> **Init process** - is the parent of all processes, executed by the kernel during the **booting** of the system. It has a pid of **1**.
+
+> Process Table - is a data structure in the RAM of a computer that holds information about the processes. Currently been handled by the OS.
+
+> **Process Entry** - is created when the process is created by a fork() system call. 
+
+
+
+<br>
+How code ran in orphan state ? 
+
+- Parents executes and terminates before child.
+- Child becomes an orphan because its parent died while it was still alive(executing)
+- The init process (mother of all processes of system) adopts the child and becomes its parent until it terminates.
+- This adoption changes the ppid of the child to 1 (the ppid of the init process) during its execution.
+- Then init process then removes or reaps the child from the process table after its execution 
+- This explains why we couldn't find the child process in the process table with the "ps -eaf" command.
+
 
 
 
