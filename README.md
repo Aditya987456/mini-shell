@@ -286,6 +286,20 @@ How code ran in orphan state ?
 - Then init process then removes or reaps the child from the process table after its execution 
 - This explains why we couldn't find the child process in the process table with the "ps -eaf" command.
 
+<br>
+<br>
+
+> **Zombie Process** - A process that has finished execution, but whose parent has NOT collected its exit status.
+
+```
+There is one process table per system. The size of the process table is finite . If too many zombie processes are generated, then the process table will be full. That is , the system will not be able to generate any new process, then the system will come to a standstill. Hence, we need to prevent the creation of zombie processes.
+```
+
+
+
+
+
+
 
 
 
