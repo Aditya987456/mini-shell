@@ -1,13 +1,31 @@
-#include<stdio.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
-int main(void){
+extern char **environ;
 
-    
-    printf("PID of the process is : %d\n", getpid());
+int main() {
+    pid_t pid;
 
-    char *args[] = { "Hello", "saar", "whatsapp", NULL};
+    printf("Shell process PID: %d\n", getpid());
 
+    pid = fork();
+
+    if (pid == 0) {
+        // CHILD
+        printf("Child PID: %d (before exec)\n", getpid());
+
+        char *args[] = {"/bin/ls", "-l", NULL};
+        execve("/bin/ls", args, environ);
+
+        // runs only if execve fails
+        perror("execve failed");
+    } 
+    else {
+        // PARENT
+        wait(NULL);
+        printf("Back in shell (parent still alive)\n");
+    }
 
     return 0;
 }

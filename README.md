@@ -296,6 +296,38 @@ There is one process table per system. The size of the process table is finite .
 ```
 
 
+<br>
+<br>
+<br>
+
+###  **execve()**
+---
+execve() is a system call that replaces the currently running program inside a process with a new program.
+
+execve() replaces the current process image with a new program without creating a new process, keeping the same PID.
+
+```
+int execve(const char *path, char *const argv[], char *const envp[]);
+```
+- path → exact path of executable (e.g. /bin/ls)<br>
+- argv → argument list (must end with NULL) <br>
+- envp → environment variables (must end with NULL)
+
+<br>
+
+> If execve() succeeds, it never returns. <br>Code after execve() runs only if it fails.
+
+<br>
+
+> **Why shells need fork() before execve()**
+
+* If a shell called execve() directly:<br>
+```shell → becomes command → exits → shell gone ```
+
+* therefore shell do things like this - <br>
+ ``` fork() ,  child  → execve(command) , parent → stays shell```
+
+
 
 
 
