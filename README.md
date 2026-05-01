@@ -204,6 +204,39 @@ It is basically a program in execution.
 <br>
 
 
+> **What happens when we open terminal**
+
+OS starts: 
+- terminal program
+- shell (like bash)
+
+```
+systemd (PID 1)
+ └── terminal
+      └── bash    
+```
+
+- bash becomes the parent process
+
+
+<br>
+
+
+> **What is PID = 1?**
+
+PID 1 = first process started by OS (usually systemd)
+- Created at system boot
+- Parent of all processes
+- Adopts orphan processes
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
 ### fork() system call - used to create processes , It takes no arguments.
 
 ---
@@ -215,6 +248,10 @@ Return -
 - pid of the child in the parent
 - 0 on the child
 - -1 if unsuccessful.
+
+<br>
+
+> **fork() returns a value so that parent and child can identify themselves and execute different logic.**
 
 > **Basic operation -** After a new child process is created, both processes will execute the new instruction following the fork() system call.
 
@@ -263,12 +300,157 @@ Shell (always alive)
 
 ```
 
+
 <br>
 <br>
 
-> **Orphan process** - This is a rinning process whose parent has finished or terminated.
+
+> **Why fork is ALWAYS needed (external commands)**
+
+Because:
+- Shell must stay alive
+- Without fork:
+- bash → exec(ls) → bash gone 
+
+
+<br>
+<br>
+<br>
+
+
+> **Why can’t bash just run your program directly?**
+
+If bash did:  
+execvp("./a.out", argv);
+
+Then:    
+```
+bash → becomes your program → exits → shell gone 
+```
+- We will lose the terminal
+
+- That’s why fork is needed
+
+-  **fork() protects the shell by running our program in a separate process.**
+
+
+
+<br>
+<br>
+<br>
+<br>
+
+
+> When we call fork(), why does it return a value? Why not just create a process silently?
+
+fork() returns a value so that BOTH processes (parent and child) can know who they are.
+Because after fork(), two processes are running the same code.
+
+
+<br>
+<br>
+<br>
+
+
+```After fork()```
+
+Two processes now exist:  
+- Process 1 (Parent)  
+- Process 2 (Child)
+
+***Both processes run the program — but each process chooses a different branch. Therefore both block runs -***
+
+
+<br>
+<br>
+
+```
+getpid() → real process ID
+pid (from fork()) → just a signal value
+```
+
+```
+pid == 0   → child
+pid > 0    → parent (value = child PID)
+pid == -1  → error (fork failed)
+```
+
+<br>
+<br>
+
+**When pid = -1?**
+- Too many processes
+- Not enough memory
+- System limit reached
+
+<br>
+<br>
+
+> **Mental model (ROOM concept - my observation.)**
+-  Child room → pid = 0
+-  Parent room → pid > 0 (child PID)
+
+
+<br>
+<br>
+<br>
+
+
+```
+pid_t pid = fork();
+
+if (pid == 0) {
+    printf("Child\n");
+} else {
+    printf("Parent\n");
+}
+```
+<br>
+
+Output-
+```   
+Child
+Parent
+```
+
+<br>
+<br>
+<br>
+
+> **Real use of fork returning the pid.**
+```
+pid = fork();
+
+if (pid == 0) {
+    execvp("ls", argv);   // child runs command
+} else {
+    wait(NULL);           // parent waits
+}
+```
+
+***Now we can correctly do -***
+```
+child → exec
+parent → wait
+```
+
+<br>
+<br>
+<br>
+
+> **Imp things -** 
+ - Parent id of child process changes during execution to 1.
+ - child process is removed from process table after exceution.
+
+<br>
+<br>
+<br>
+
+> **Orphan process** - This is a running process whose parent has finished or terminated.
 
 > **Init process** - is the parent of all processes, executed by the kernel during the **booting** of the system. It has a pid of **1**.
+
+> Note - “In modern Linux systems, orphan processes are not always adopted by PID 1. They may be adopted by an intermediate process acting as a subreaper (like a shell or systemd), which is why the PPID may not be 1.”
 
 > Process Table - is a data structure in the RAM of a computer that holds information about the processes. Currently been handled by the OS.
 
@@ -283,7 +465,7 @@ How code ran in orphan state ?
 - Child becomes an orphan because its parent died while it was still alive(executing)
 - The init process (mother of all processes of system) adopts the child and becomes its parent until it terminates.
 - This adoption changes the ppid of the child to 1 (the ppid of the init process) during its execution.
-- Then init process then removes or reaps the child from the process table after its execution 
+- Then init process then **removes** or reaps the child from the ***process table*** after its execution 
 - This explains why we couldn't find the child process in the process table with the "ps -eaf" command.
 
 <br>
@@ -291,11 +473,42 @@ How code ran in orphan state ?
 
 > **Zombie Process** - A process that has finished execution, but whose parent has NOT collected its exit status.
 
+- Zombie exists ONLY because parent hasn’t called wait() yet
+
+```
+Child exits → becomes zombie
+        ↓
+Parent calls wait()
+        ↓
+Kernel:
+  - gives exit status to parent
+  - deletes process table entry
+        ↓
+Zombie disappears
+```
+
+<br>
+<br>
+<br>
+
+Correct way - 
+```
+if (fork() == 0) {
+    exit(0);
+} else {
+    wait(NULL);  // cleans zombie immediately
+}
+```
+
+<br>
+
+
 ```
 There is one process table per system. The size of the process table is finite . If too many zombie processes are generated, then the process table will be full. That is , the system will not be able to generate any new process, then the system will come to a standstill. Hence, we need to prevent the creation of zombie processes.
 ```
 
 
+<br>
 <br>
 <br>
 <br>
@@ -326,6 +539,80 @@ int execve(const char *path, char *const argv[], char *const envp[]);
 
 * therefore shell do things like this - <br>
  ``` fork() ,  child  → execve(command) , parent → stays shell```
+
+
+
+ <br>
+ <br>
+ <br>
+
+ ### **Getline()** - It reads an entire line of input and automatically allocates enough memory (buffer) to store it.
+ ---  
+
+ <br>
+ <br>
+
+**Why getline() is needed ?**
+
+In shell programs, input length is unknown. Using fixed-size buffers (like char buf[100]) can:<br>
+- Cut long input
+- Cause buffer overflow
+- Break commands
+
+<br>
+
+> *getline() solves this by allocating memory dynamically. (DMA)*
+
+> **Buffer** - A buffer is a chunk of memory used to temporarily store input.<br>
+With getline(), the buffer is:<br>
+Created automatically<br>
+Grown automatically if input is long.
+
+<br>
+<br>
+
+Syntax -
+```
+ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+```
+lineptr → pointer to the buffer (may be allocated or resized)<br>
+n → size of allocated buffer<br>
+stream → input source (stdin)
+
+<br>
+
+> getline() working internally --- <br>
+- Checks if buffer exists
+
+- Allocates memory if needed
+
+- Reads the full line (including spaces)
+
+- Stores the line in buffer
+
+- Appends '\n' and '\0'
+
+<br>
+<br>
+<br>
+
+
+> Why not use int for size?
+
+Because int can overflow and is not portable; size_t safely represents memory sizes.
+
+<br>
+
+> Difference between size_t and ssize_t?
+
+size_t is unsigned and used for sizes, while ssize_t is signed and used for return values that may indicate errors.
+
+<br>
+
+```
+size_t = size only
+ssize_t = size OR error
+```
 
 
 

@@ -4,19 +4,19 @@
 
 
 //pid -- change in each execution of the process....
-// int main( void ){
+int main( void ){
 
-//     int a = 3;
-//     int b = 5;
-//     int sum = a+b;
+    int a = 3;
+    int b = 5;
+    int sum = a+b;
 
-//     __pid_t pid;   //defining the variable that represent the process ID
-//     pid = getpid();
+    __pid_t pid;   //defining the variable that represent the process ID
+    pid = getpid();
 
-//     printf("Sum is %d\n", sum);
-//     printf("PID is %u\n", pid);
-//     return 0;
-// }
+    printf("Sum is %d\n", sum);
+    printf("PID is %u\n", pid);
+    return 0;
+}
 
 
 
@@ -45,6 +45,8 @@
 
 //---------------------fork()-----------------------------
 
+
+//It gives the pid of the current runnung process - echo $$
 /*
 After fork(), the program exists twice.
 Each copy runs the if–else.
@@ -52,29 +54,29 @@ In one process the if runs,
 in the other process the else runs.
 */
 
-int main(){
-    __pid_t pid;
-    __pid_t ppid;
+// int main(){
+//     __pid_t pid;
+//     __pid_t ppid;
 
 
-    printf("Before fork I was one\n");
+//     printf("Before fork I was one\n");
 
-    pid = fork();
-    if(pid == -1){
-        perror("Unsuccessfull");
-        return 1;
-    }
+//     pid = fork();
+//     if(pid == -1){
+//         perror("Unsuccessfull");
+//         return 1;
+//     }
 
-    if(pid == 0){
-        sleep(30);
-        printf("I am the child\n");
+//     if(pid == 0){
+//         sleep(30);
+//         printf("I am the child\n");
 
-    }else{
-        ppid = getppid();
-        printf("I am the Parent\n");
-        printf("Parent ppid is %u\n", ppid);
-    }
+//     }else{
+//         ppid = getppid();
+//         printf("I am the Parent\n");
+//         printf("Parent ppid is %u\n", ppid);
+//     }
     
-    return 0;
-}
+//     return 0;
+// }
 
