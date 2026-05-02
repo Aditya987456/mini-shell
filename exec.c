@@ -12,17 +12,20 @@ int main() {
     pid = fork();
 
     if (pid == 0) {
-        // CHILD
+        // child.
         printf("Child PID: %d (before exec)\n", getpid());
 
         char *args[] = {"/bin/ls", "-l", NULL};
-        execve("/bin/ls", args, environ);
+        int val = execve("/bin/ls", args, environ);
+        if(val == -1){
+            perror("Error in exceve return -1.");
+        }
 
         // runs only if execve fails
         perror("execve failed");
     } 
     else {
-        // PARENT
+        // parentbecz pid>0...
         wait(NULL);
         printf("Back in shell (parent still alive)\n");
     }

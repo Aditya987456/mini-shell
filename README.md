@@ -505,6 +505,10 @@ if (fork() == 0) {
 
 ```
 There is one process table per system. The size of the process table is finite . If too many zombie processes are generated, then the process table will be full. That is , the system will not be able to generate any new process, then the system will come to a standstill. Hence, we need to prevent the creation of zombie processes.
+
+> Process to prevent creation of zombie process - 
+1. using wait() system call.
+2. 
 ```
 
 
@@ -512,6 +516,44 @@ There is one process table per system. The size of the process table is finite .
 <br>
 <br>
 <br>
+
+
+
+### **wait() vs sleep()**
+
+> **wait()**
+- Used for process management
+- Parent waits for child to finish
+- Removes zombie process
+- Returns child’s PID + exit status
+
+
+> **sleep()**
+- Used for delaying execution
+- Pauses process for given time
+- Does NOT interact with child processes
+- Does NOT remove zombies
+-  just a timer
+
+
+<br>
+
+```
+fork();
+
+sleep(10);   // zombie stays
+
+wait(NULL);  // zombie removed
+```
+
+
+
+<br>
+<br>
+<br>
+<br>
+
+
 
 ###  **execve()**
 ---
@@ -540,6 +582,13 @@ int execve(const char *path, char *const argv[], char *const envp[]);
 * therefore shell do things like this - <br>
  ``` fork() ,  child  → execve(command) , parent → stays shell```
 
+
+<br>
+<br>
+
+```
+argv is an array of argument strings passed to the new program. by convention , the first of these strings should contain the filename associated with the file being executed. envp is an array of strings, conventionally of the form key=value, which are passed as environment to the new program. Both argv and envp must be terminated by a NULL pointer. The argument vector and environment can be accessed by the called program's main funvtion, when it is defined as:
+```
 
 
  <br>
@@ -581,7 +630,12 @@ stream → input source (stdin)
 
 <br>
 
-> getline() working internally --- <br>
+```
+getline() dynamically reads a full line from input, allocating or resizing memory automatically, and stores it in a buffer (line) whose size (len) is managed internally.
+```
+<br>
+
+> **getline() working internally** --- <br>
 - Checks if buffer exists
 
 - Allocates memory if needed
@@ -591,6 +645,27 @@ stream → input source (stdin)
 - Stores the line in buffer
 
 - Appends '\n' and '\0'
+
+
+<br>
+
+```
+1. Check: line == NULL ?
+   → YES → malloc(initial_size)
+
+2. Read input character by character
+
+3. If buffer too small:
+   → realloc(bigger_size)
+
+4. Store string (with '\n' + '\0')
+
+5. Update:
+   line → buffer
+   len  → new size
+
+6. Return number of characters read
+```
 
 <br>
 <br>
@@ -612,6 +687,18 @@ size_t is unsigned and used for sizes, while ssize_t is signed and used for retu
 ```
 size_t = size only
 ssize_t = size OR error
+```
+
+<br>
+<br>
+
+> **Working -**
+```
+getline() reads an entire line from stream, storing the address of the buffer containing the text into *lineptr. The buffer is null-terminated and includes the newline character, if one was found.
+
+If *lineptr is NULL, then getline() will allocate a buffer for storing the line, which should be freed by the user program.
+
+Alternatively, before calling getline(), *lineptr can contain a pointer to a malloc(3) allocated buffer *n byter in size. If the buffer is not large enough to hold the line, getline() resizes it with realloc(30), updating *lineptr and *n as necessary.
 ```
 
 
