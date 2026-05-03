@@ -704,7 +704,206 @@ Alternatively, before calling getline(), *lineptr can contain a pointer to a mal
 
 
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
+
+
+### Strtok() - function that splits a string into pieces using delimiters
+---
+
+
+<br>
+<br>
+<br>
+
+
+```
+char *strtok(char *str, const char *delim);
+```
+**str** → input string (only first time) <br>
+**delim** → characters where splitting happens.(characters where to split).<br>
+**return** → pointer to token
+
+<br>
+<br>
+
+
+> **Best mental model** -
+```
+strtok = cutter,
+string = rope,
+delim = places to cut.
+```
+
+<br>
+<br>
+
+> **strtok does**:
+
+- Find delimiter --> things that we have gave in *delim.
+- Replace it with '\0'
+- Return start of token
+- Remember where it stopped
+- Continue next time.
+
+<br>
+
+```
+strtok(str, " ");   // first call
+strtok(NULL, " ");  // next calls
+
+means --> continue from last position (don’t restart).
+```
+
+<br>
+for this strtok uses - a hidden static pointer
+
+- static char *saved_ptr;
+- first call → start from str
+- next calls → continue from saved_ptr
+
+```
+Because it remembers position, so
+NULL = continue from last cut.
+```
+
+<br>
+<br>
+
+> **Note** - Input string must be writable.<br>
+strtok modifies string -- replaces delimiter with \0 <br>
+therefore array not char * i.e string.
+
+
+<br>
+<br>
+<br>
+
+
+> **IMPORTANT NOTE - about strtok...** 
+
+```
+1. This is not safe:
+    char *str = "hello world";
+    strtok(str, " ");
+
+    Because:
+    "hello world" is in read-only memory
+    strtok tries to modify it → crash / undefined behavior.
+
+
+2. This is SAFE:
+    char str[] = "hello world";
+    strtok(str, " ");
+
+    Because:
+    string is copied into writable memory
+    strtok can modify it.
+
+
+3. Also safe (copy method):
+    char *str = "hello world";
+    char newStr[50];
+    strcpy(newStr, str);
+    strtok(newStr, " ");
+
+    Because:
+    we created a writable copy.
+
+```
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+### Command line argument
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+## Printf basics -
+| Specifier | Meaning           |
+| --------- | ----------------- |
+| `%s`      | string (`char *`) |
+| `%d`      | int               |
+| `%u`      | unsigned int      |
+| `%c`      | char              |
+| `%f`      | float             |
+| `%p`      | pointer           |
 
 
 
