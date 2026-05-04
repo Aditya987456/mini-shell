@@ -831,11 +831,50 @@ therefore array not char * i.e string.
 <br>
 
 
-### Command line argument
+### Command line argument - These are argument passed from the command line to the C program when they are executed. 
 ---
 
+- Inputs passed to program, stored as array of strings (argv) with count (argc)
+
+<br>
 
 
+
+
+```
+int main(int argc, char *argv[])
+```
+
+
+<br>
+<br>
+
+
+> **Argument count - [argc]**
+stores number of command line arguments passed by the user including the name of the program.
+
+<br>
+
+> **Argument Vectors - [argv]**
+This is a NULL terminated array of strings (character pointers) used to store the entire list of command line arguments.
+
+
+<br>
+<br>
+
+
+```
+Example -
+
+./program hello world
+
+argc = 3
+argv = ["./program", "hello", "world"]
+
+```
+
+
+**NOTE** - argv is an array of string pointers, so it can be written as either char *argv[] or char **argv
 
 
 
