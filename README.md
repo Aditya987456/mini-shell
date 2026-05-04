@@ -877,7 +877,23 @@ argv = ["./program", "hello", "world"]
 **NOTE** - argv is an array of string pointers, so it can be written as either char *argv[] or char **argv
 
 
+<br>
+<br>
+<br>
+<br>
+<br>
 
+
+# Shell.c <br>
+### Now Implementing everything at one place-
+
+<br>
+<br>
+
+
+> **Full flow -** 
+<br>
+User types → shell reads → shell splits → shell decides → shell executes → repeat 
 
 
 
