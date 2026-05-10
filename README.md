@@ -7,6 +7,149 @@ Building this project for  **learning OS fundamentals**.
 
 
 
+<br>
+<br>
+<br>
+
+
+
+## Mini Shell — Simple Summary
+
+A shell is a program that:
+- takes commands from user
+- understands them
+- runs programs
+- keeps running forever
+
+Example:
+```bash
+ls
+mkdir test
+cd folder
+```
+
+
+<br>
+<br>
+
+
+
+**NOTE -** I am NOT building commands like:
+
+- `ls`
+- `mkdir`
+- `touch`
+
+Linux already has those programs.
+
+**I am building:** the thing that runs those commands.
+
+My shell: ```Aditya-Shell :>```
+
+- reads input
+- parses command
+- creates child process using `fork()`
+- runs program using `execvp()`
+- waits using `wait()`
+
+<br>
+
+Also, Special commands like:
+
+```bash
+cd, exit, pwd, help
+```
+
+cannot use `execvp()`,
+so shell handles them manually using:
+
+<br>
+<br>
+
+
+When I run:
+
+```bash
+./shell
+```
+
+terminal changes from:
+
+```bash
+aditya2981@HP:~/mini-shell$  ---> Aditya-Shell :>
+```
+
+<br>
+<br>
+
+
+**i.e** Now my shell is running on top of Bash.
+
+Even if I do:
+
+```bash
+cd ../../
+```
+
+I am NOT leaving my shell. 
+Only current directory changes.
+
+
+<br>
+Commands like:
+
+```bash
+mkdir
+touch
+ls
+```
+
+still work because my shell calls Linux executables like:
+
+```bash
+/bin/ls
+/bin/mkdir
+```
+
+
+<br>
+<br>
+<br>
+
+
+> Goal of this project is NOT replacing Bash.
+
+Goal is:
+
+- understanding OS internals
+- process creation
+- command execution
+- how shells work internally
+
+<br>
+
+**Important concepts learned:**
+
+- `fork()`
+- `execvp()`
+- `wait()`
+- processes
+- command parsing
+- current working directory
+- built-in commands
+
+
+
+<br>
+<br>
+
+> **Future improvements planned:**
+- pipes (`|`)
+- input/output redirection
+- background processes
+- signal handling
+- command history
+
 
 
 <br>
@@ -1126,9 +1269,6 @@ args[3] ---> NULL
 
 <br>
 <br>
-
-<br>
-<br>
 <br>
 <br>
 
@@ -1181,12 +1321,6 @@ Changing POINTER  -> use **
 Changing CONTENT  -> use *
 ```
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
 -----
 
@@ -1249,62 +1383,35 @@ shell → fork → child → execvp → ls runs → child exits → shell contin
 
 
 
-
-
-
-
-<br>
 <br>
 <br>
 <br>
 <br>
 
+### Some extra built in command like cd, exit, pwd, help that need to handle separately not using fork+execve
+---
 
-------
+<br>
 
-### Shell Flow
+> **NOTE**: ***Because the shell itself is just a running process.<br>
+Some commands need to change or control that exact process, not a temporary child process.***
 
-```txt
-getline()
-    ↓
-line points to input string
-    ↓
-strtok() splits string
-    ↓
-token stores each word
-    ↓
-args stores token pointers
-    ↓
-execvp(args[0], args)
-```
+<br>
+<br>
 
 
+> **cd** - here we use chdir()
 
+chdir() is a system call wrapper.
+
+It asks Linux kernel: 
+"Change current working directory
+of this process."
 
 
 
 
 
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 <br>
 <br>
 
@@ -1322,49 +1429,6 @@ execvp(args[0], args)
 
 
 
-
-
-
-
-
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-
-
-
-## Printf basics -
-| Specifier | Meaning           |
-| --------- | ----------------- |
-| `%s`      | string (`char *`) |
-| `%d`      | int               |
-| `%u`      | unsigned int      |
-| `%c`      | char              |
-| `%f`      | float             |
-| `%p`      | pointer           |
 
 
 

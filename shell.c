@@ -76,6 +76,71 @@ void execute_command(char **args){
 
 
 
+//## handles built in commands here - cd, pwd, help, exit 
+//(we can do many more but i am just taking this main main things...)
+
+int handle_builtIn(char **args){
+
+    // 1. exit  --> if exit types by user check by comparing and then, exit, since exit(0) - becz no error exit it is just by user.
+    if(strcmp(args[0], "exit") == 0){
+        exit(0);
+    }
+
+
+
+    // 2. cd 
+    if(strcmp(args[0], "cd") == 0){
+        if(args[1] == NULL){
+        printf("cd: missing argument\n");
+
+        } else {
+            if(chdir(args[1]) != 0){  //folder doesn't exist here...therefore it not return success i.e 0
+                perror("cd failed");
+            }
+        }
+        return 1;  //means found the cd
+    }
+
+
+
+    //3. pwd
+    if(strcmp(args[0], "pwd") == 0){
+
+        char cwd[1024];   //i should use dma later...
+
+        if(getcwd(cwd, sizeof(cwd)) != NULL){
+            printf("%s\n", cwd);
+        }else{
+            perror("pwd failed");
+        }
+
+
+        return 1;
+    }
+
+
+
+
+    //4. help
+    if(strcmp(args[0], "help") == 0){
+
+        printf("Hey thsese are some built-in commands:\n");
+        printf("cd <dir>\n");
+        printf("pwd\n");
+        printf("exit\n");
+        printf("help\n");
+
+        return 1;
+    }
+
+
+
+
+
+    return 0; //means builtin is not there so return 0 now it will do execute work...using execute funtion.
+}
+
+
 
 
 
@@ -90,7 +155,7 @@ void execute_command(char **args){
 int main(){
 
     while(1){
-        printf("Aditya-Shell :) ");
+        printf("Aditya-Shell :> ");
         fflush(stdout);  //output may wait in buffer so it force print now.
     
 
@@ -111,8 +176,18 @@ int main(){
     }
     
 
+
+
     //#2
     parse_input(line, args);
+
+
+
+    // Check is there is any builtin command ??? if there handling manually...by own builtin function
+    if(handle_builtIn(args) == 1){
+        continue;
+    }
+
 
 
 
