@@ -591,9 +591,31 @@ argv is an array of argument strings passed to the new program. by convention , 
 ```
 
 
+<br>
+<br>
+<br>
+
+> **Here use -- execvp() instead of execve()** <br>
+
+
+**execvp()** is useful because:
+
+- automatically searches PATH
+- also lets you pass custom environment variables
+
+
+Example: ```execvp("ls", args, custom_env);```
+
+Meaning:<br>
+Find **ls** automatically using PATH<br>
+and run it with custom environment.
+
  <br>
  <br>
  <br>
+ <br>
+ <br>
+
 
  ### **Getline()** - It reads an entire line of input and automatically allocates enough memory (buffer) to store it.
  ---  
@@ -607,6 +629,17 @@ In shell programs, input length is unknown. Using fixed-size buffers (like char 
 - Cut long input
 - Cause buffer overflow
 - Break commands
+
+<br>
+
+<br>
+
+> getline() changes the **pointer** itself. Not just contents.<br>
+* allocate memory<br>
+* resize memory<br>
+* change line<br>
+
+***So function needs access to ORIGINAL pointer.***
 
 <br>
 
@@ -895,12 +928,385 @@ argv = ["./program", "hello", "world"]
 <br>
 User types → shell reads → shell splits → shell decides → shell executes → repeat 
 
+<br>
+<br>
+<br>
+
+
+
+##  Pointer concept here...
+
+### Basic Variables
+
+```c
+int a = 10;
+```
+
+- `a` → normal variable
+- type = `int`
+
+Now,  **&a  --> address of a** 
+
+Rule:
+
+```txt
+If x is type T
+then &x is type T*
+```
+
+Examples:
+
+| Variable Type | After `&` |
+|---|---|
+| `int` | `int *` |
+| `int *` | `int **` |
+| `char *` | `char **` |
+
+Taking address adds one `*`.
+
+---
+
+### Pointer (`*`)
+
+```c
+int *p = &a;
+```
+
+Means - p stores **address** of a
+
+
+
+<br>
+
+#### Two Meanings of `*`
+
+> In Declaration - means pointer type.<br>
+char *p;
+
+
+
+<br>
+
+> In Expression - means dereference/access value. <br>
+*p
+
+<br>
+<br>
+
+---
+
+### Double Pointer (`**`)
+
+```c
+int **pp = &p;
+```
+
+---
+
+<br>
+
+### Strings in C
+
+```c
+char *line;
+```
+
+means:
+
+```txt
+pointer to string
+```
+
+Example: line ---> "hello"
+
+
+---
+
+<br>
+
+
+### NULL Pointer
+
+```c
+char *line = NULL;
+```
+
+means:
+- pointer variable exists
+- currently points nowhere
+
+NOT that variable doesn't exist.
+
+---
+
+<br>
+<br>
+
+### Why `char **` ?
+
+Used when:
+- modifying original pointer
+- dynamic memory allocation
+- arrays of strings
+
+---
+
+### getline()
+
+```c
+getline(&line, &len, stdin);
+```
+
+Because:
+
+| Expression | Type |
+|---|---|
+| `line` | `char *` |
+| `&line` | `char **` |
+
+`getline()` internally do:
+
+```c
+*line = malloc(...);
+```
+
+**so it needs:** char **
+
+
+---
+
+<br>
+
+### strtok()
+
+```c
+char *token = strtok(line, " ");
+```
+
+- splits string into tokens
+- returns `char *`
+
+<br>
+
+`strtok()` modifies original string:
+
+```txt
+"ls -la /home"
+```
+
+becomes:
+
+```txt
+"ls\0-la\0/home\0"
+```
+
+---
+
+<br>
+<br>
+
+### args Array
+
+```c
+char *args[100];
+```
+
+stores multiple token pointers:
+
+```txt
+args[0] ---> "ls"
+args[1] ---> "-la"
+args[2] ---> "/home"
+args[3] ---> NULL
+```
+
+
+---
+
+
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+
+### **getline vs strtok**
+-----------------------------------
+
+<br>
+
+> **getline(&line, &len, stdin)**
+
+- allocates/resizes memory
+- changes line pointer
+- updates len
+- stores input content
+
+Internally (under the hood):<br>
+- line = malloc(...)<br>
+- len = new_size
+
+**Therefore:**<br>
+char **line<br>
+size_t *len
+
+<br>
+<br>
+
+> **strtok(line, " \n")**
+
+- uses existing memory
+- dereferences line
+- replaces delimiters with '\0'
+- returns token pointers
+
+**Internally conceptually:**
+*line = '\0'
+
+**Therefore:**
+char *line
+
+-----------------------------------
+
+<br>
+<br>
+
+
+```
+Rule:
+Changing POINTER  -> use **
+Changing CONTENT  -> use *
+```
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+-----
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+### execution step -
+
+**User types:**
+```
+ls -l
+```
+
+
+**After parsing:**
+```
+args[0] = "ls"
+args[1] = "-l"
+args[2] = NULL
+```
+
+execvp(args[0], args);
+
+becomes: ```execvp("ls", ["ls", "-l", NULL]);```
+
+<br>
+
+> **NOTE -** <br>
+***Unix convention -*** argv[0] should contain the program name, so shells pass the command name again inside the argument array.()
+
+<br>
+
+Means:
+1. args[0]
+   → which program to run
+   → "ls"
+
+2. args
+   → full argument list passed into program
+   → becomes argv[] inside ls program
+
+<br>
+
+**fork():**
+    creates child process
+
+**execvp():**
+    replaces child with actual program
+
+**wait():**
+    parent shell waits for child to finish
+
+> Flow:<br>
+shell → fork → child → execvp → ls runs → child exits → shell continues
 
 
 
 
 
 
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+------
+
+### Shell Flow
+
+```txt
+getline()
+    ↓
+line points to input string
+    ↓
+strtok() splits string
+    ↓
+token stores each word
+    ↓
+args stores token pointers
+    ↓
+execvp(args[0], args)
+```
+
+
+
+
+
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 
 
