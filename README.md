@@ -1,4 +1,4 @@
-# Mini-Shell
+# Mini-Shell - ( shell.c)
 
 A minimal Unix-like shell in C to understand how operating systems
 execute commands under the hood.
@@ -13,7 +13,7 @@ Building this project for  **learning OS fundamentals**.
 
 
 
-## Mini Shell — Simple Summary
+## Mini Shell — Simple Summary 
 
 A shell is a program that:
 - takes commands from user
